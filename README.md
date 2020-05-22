@@ -3,9 +3,13 @@
 
 ##  简介
 
-* 基于CameraX beta版本和zxing对二维码扫描进行封装
+基于CameraX beta版本和zxing对二维码扫描进行封装
 
-* 识别二维码自动放大
+修正了preview分辨率过低的问题，同时参照camreaview的方式对scanview进行了一次调整
+
+## 功能介绍
+
+* 二维码距离远自动放大
 
 * 自动对焦
 
@@ -14,7 +18,6 @@
 * 双击放大
 
 
-修正了preview分辨率过低的问题，同时参照camreaview的方式对scanview进行了一次调整。
 
 ## 简单使用
 
