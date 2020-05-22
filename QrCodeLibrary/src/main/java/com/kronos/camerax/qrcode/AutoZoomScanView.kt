@@ -5,11 +5,9 @@ import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
+import android.view.View
 import android.widget.FrameLayout
-import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
-import io.reactivex.Flowable
-import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.view_qr_scan_auto_zoom.view.*
 
 class AutoZoomScanView @JvmOverloads constructor(
@@ -19,6 +17,7 @@ class AutoZoomScanView @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     private var cameraXModule: CameraXModule
+    private var resultListener: OnQrResultListener? = null
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_qr_scan_auto_zoom, this)
@@ -38,27 +37,31 @@ class AutoZoomScanView @JvmOverloads constructor(
         preView.post {
             cameraXModule.bindWithCameraX({
                 try {
-                    Flowable.just(it).observeOn(AndroidSchedulers.mainThread())
-                        .doOnNext { result ->
-                            Toast.makeText(
-                                context, result.text,
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }.subscribe()
+                    preView.post {
+                        resultListener?.onSuccess(this, it.text)
+                    }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }, lifecycleOwner)
         }
+        apply { }
     }
 
     fun stopCamera() {
         // cameraXModule.
     }
 
-
-    fun reset() {
+    fun reStart() {
         cameraXModule.resetAnalyzer()
+    }
+
+    fun setOnQrResultListener(block: (View, String) -> Unit) {
+        resultListener = object : OnQrResultListener {
+            override fun onSuccess(view: View, qrResult: String) {
+                block.invoke(view, qrResult)
+            }
+        }
     }
 
     private val gestureDetector =

@@ -1,8 +1,9 @@
 package com.kronos.camerax.sample
 
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.yanzhenjie.permission.Action
 import com.yanzhenjie.permission.AndPermission
 import com.yanzhenjie.permission.runtime.Permission
 import kotlinx.android.synthetic.main.activity_main.*
@@ -21,5 +22,12 @@ class MainActivity : AppCompatActivity() {
             }
             .onDenied { permissions: List<String?>? -> }
             .start()
+        scanView.setOnQrResultListener { view: View, s: String ->
+            Toast.makeText(
+                this@MainActivity, s,
+                Toast.LENGTH_LONG
+            ).show()
+            scanView.reStart()
+        }
     }
 }

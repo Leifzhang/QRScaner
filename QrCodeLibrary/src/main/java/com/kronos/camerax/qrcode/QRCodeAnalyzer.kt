@@ -47,7 +47,6 @@ class QRCodeAnalyzer(private val module: CameraXModule, function: (Result) -> Un
 
     override fun analyze(image: ImageProxy) {
         if (image.format !in yuvFormats) {
-            Log.e("QRCodeAnalyzer", "Expected YUV, now = ${image.format}")
             return
         }
         val startTime = System.currentTimeMillis();
@@ -60,7 +59,7 @@ class QRCodeAnalyzer(private val module: CameraXModule, function: (Result) -> Un
         val bitmap = BinaryBitmap(binarizer)
         try {
             val detectorResult = Detector(bitmap.blackMatrix).detect(map)
-            if (zoomCamera(detectorResult.points, image)) {
+            if (zoomCamera(detectorResult.points, bitmap)) {
                 image.close()
                 return
             }
@@ -77,13 +76,13 @@ class QRCodeAnalyzer(private val module: CameraXModule, function: (Result) -> Un
         }
     }
 
-    private fun zoomCamera(points: Array<ResultPoint>, image: ImageProxy): Boolean {
-        val qrWidth = calculateDistance(points)
-        Log.i("BarcodeAnalyzer", "resolved!!! = $qrWidth")
-        val imageWidth = image.width.toFloat()
+    private fun zoomCamera(points: Array<ResultPoint>, image: BinaryBitmap): Boolean {
+        val qrWidth = calculateDistance(points) * 3
+        val imageWidth = image.blackMatrix.width.toFloat()
         val zoomInfo = camera?.cameraInfo?.zoomState?.value
         zoomInfo?.apply {
             if (qrWidth < imageWidth / 8) {
+                Log.i("BarcodeAnalyzer", "resolved!!! = $qrWidth  imageWidth:${imageWidth}")
                 val maxScale = zoomInfo.maxZoomRatio
                 val curValue = zoomInfo.zoomRatio
                 val gap = maxScale - curValue

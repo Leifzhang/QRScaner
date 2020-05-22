@@ -53,7 +53,7 @@ class CameraXModule(private val view: AutoZoomScanView) {
                     .build()
                 preview?.setSurfaceProvider(view.preView.createSurfaceProvider(null))
 
-                cameraExecutor = Executors.newFixedThreadPool(5)
+                cameraExecutor = Executors.newSingleThreadExecutor()
                 qrCodeAnalyzer = QRCodeAnalyzer(this) { function(it) }
                 // ImageAnalysis
                 imageAnalyzer = ImageAnalysis.Builder()
