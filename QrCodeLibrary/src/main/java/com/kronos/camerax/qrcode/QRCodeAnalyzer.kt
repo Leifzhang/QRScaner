@@ -77,7 +77,7 @@ class QRCodeAnalyzer(private val module: CameraXModule, function: (Result) -> Un
     }
 
     private fun zoomCamera(points: Array<ResultPoint>, image: BinaryBitmap): Boolean {
-        val qrWidth = calculateDistance(points) * 3
+        val qrWidth = calculateDistance(points) * 2
         val imageWidth = image.blackMatrix.width.toFloat()
         val zoomInfo = camera?.cameraInfo?.zoomState?.value
         zoomInfo?.apply {
