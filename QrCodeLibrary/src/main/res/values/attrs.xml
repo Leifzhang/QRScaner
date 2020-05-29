@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="autoScanView">
+        <attr name="analyzer_type" format="enum">
+            <enum name="zxing" value="0" />
+            <enum name="czxing" value="1" />
+        </attr>
+    </declare-styleable>
+
+</resources>

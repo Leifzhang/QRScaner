@@ -63,3 +63,10 @@ implementation 'com.github.leifzhang:QrCodeLibrary:0.0.1'
 ~~~
 
 简单的可以直接参考sample内
+
+## 特别感谢大佬
+
+[CZXing](https://github.com/devilsen/CZXing)
+
+
+扫码组件优化  把这个库做了一次瘦身

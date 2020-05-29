@@ -1,6 +1,7 @@
 package com.kronos.camerax.qrcode
 
 import android.content.Context
+import android.content.res.TypedArray
 import android.util.AttributeSet
 import android.view.GestureDetector
 import android.view.LayoutInflater
@@ -21,7 +22,11 @@ class AutoZoomScanView @JvmOverloads constructor(
 
     init {
         LayoutInflater.from(context).inflate(R.layout.view_qr_scan_auto_zoom, this)
-        cameraXModule = CameraXModule(this)
+        val attr: TypedArray? =
+            context.obtainStyledAttributes(attrs, R.styleable.autoScanView)
+        val analyzer = attr?.getInt(R.styleable.autoScanView_analyzer_type, 0) ?: 0
+        attr?.recycle()
+        cameraXModule = CameraXModule(this, analyzer)
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
@@ -42,10 +47,6 @@ class AutoZoomScanView @JvmOverloads constructor(
             }, lifecycleOwner)
         }
         apply { }
-    }
-
-    fun stopCamera() {
-        // cameraXModule.
     }
 
     fun reStart() {

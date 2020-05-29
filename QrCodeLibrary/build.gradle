@@ -49,7 +49,7 @@ dependencies {
 
     // CameraX View class
     implementation 'androidx.camera:camera-view:1.0.0-alpha11'
-    implementation project(":czxinglibrary")
+    implementation 'com.github.leifzhang:czxinglibrary:1.0.0'
 
     implementation 'com.google.zxing:core:3.4.0'
     testImplementation 'junit:junit:4.13'

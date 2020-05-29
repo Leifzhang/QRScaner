@@ -21,14 +21,15 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class CameraXModule(private val view: AutoZoomScanView) {
+class CameraXModule(private val view: AutoZoomScanView, private val analyzerType: Int = 0) {
 
     private var lensFacing: Int = CameraSelector.LENS_FACING_BACK
     private var preview: Preview? = null
     private var imageAnalyzer: ImageAnalysis? = null
     private lateinit var cameraExecutor: ExecutorService
     private var camera: Camera? = null
-    private lateinit var qrCodeAnalyzer: QRCZXingCodeAnalyzer
+    private var qrCodeAnalyzer: QRCZXingCodeAnalyzer? = null
+    private var zXingAnalyzer: QRCodeAnalyzer? = null
     private lateinit var mLifecycleOwner: LifecycleOwner
 
 
@@ -54,7 +55,11 @@ class CameraXModule(private val view: AutoZoomScanView) {
                 preview?.setSurfaceProvider(view.preView.createSurfaceProvider())
 
                 cameraExecutor = Executors.newSingleThreadExecutor()
-                qrCodeAnalyzer = QRCZXingCodeAnalyzer(this) { function(it) }
+                if (analyzerType == 0) {
+                    zXingAnalyzer = QRCodeAnalyzer(this) { function(it) }
+                } else {
+                    qrCodeAnalyzer = QRCZXingCodeAnalyzer(this) { function(it) }
+                }
                 // ImageAnalysis
                 imageAnalyzer = ImageAnalysis.Builder()
                     // We request aspect ratio but no resolution
@@ -64,7 +69,12 @@ class CameraXModule(private val view: AutoZoomScanView) {
                     .build()
                     // The analyzer can then be assigned to the instance
                     .also {
-                        it.setAnalyzer(cameraExecutor, qrCodeAnalyzer)
+                        qrCodeAnalyzer?.apply {
+                            it.setAnalyzer(cameraExecutor, this)
+                        }
+                        zXingAnalyzer?.apply {
+                            it.setAnalyzer(cameraExecutor, this)
+                        }
                     }
 
                 // Must unbind the use-cases before rebinding them
@@ -77,8 +87,10 @@ class CameraXModule(private val view: AutoZoomScanView) {
                     camera = cameraProvider.bindToLifecycle(
                         mLifecycleOwner, cameraSelector, preview, imageAnalyzer
                     )
-                    qrCodeAnalyzer.camera = camera
-                    qrCodeAnalyzer.preview = preview
+                    zXingAnalyzer?.camera = camera
+                    zXingAnalyzer?.preview = preview
+                    qrCodeAnalyzer?.camera = camera
+                    qrCodeAnalyzer?.preview = preview
                     setFocus(view.width.toFloat() / 2, view.height.toFloat() / 2)
                     // camera?.cameraControl?.startFocusAndMetering(FocusMeteringAction.FLAG_AF)
                     // Attach the viewfinder's surface provider to preview use case
@@ -145,7 +157,8 @@ class CameraXModule(private val view: AutoZoomScanView) {
     }
 
     internal fun resetAnalyzer() {
-        qrCodeAnalyzer.resetAnalyzer()
+        qrCodeAnalyzer?.resetAnalyzer()
+        zXingAnalyzer?.resetAnalyzer()
     }
 
     companion object {

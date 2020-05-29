@@ -17,9 +17,12 @@ import kotlin.math.sqrt
 class QRCZXingCodeAnalyzer(private val module: CameraXModule, function: (String) -> Unit) :
     ImageAnalysis.Analyzer, BarcodeReader.ReadCodeListener {
 
-    private val qrReader = BarcodeReader.getInstance().apply {
-        setReadCodeListener(this@QRCZXingCodeAnalyzer)
-        prepareRead()
+    private val qrReader = BarcodeReader.getInstance()
+    private var stopSpan = false
+
+    init {
+        qrReader.setReadCodeListener(this)
+        qrReader.prepareRead()
     }
 
 
@@ -48,6 +51,10 @@ class QRCZXingCodeAnalyzer(private val module: CameraXModule, function: (String)
         if (image.format !in yuvFormats) {
             return
         }
+        if (stopSpan) {
+            image.close()
+            return
+        }
         val startTime = System.currentTimeMillis()
 
         val data = image.planes[0].buffer.toByteArray()
@@ -55,7 +62,7 @@ class QRCZXingCodeAnalyzer(private val module: CameraXModule, function: (String)
         val width = image.width
         pauseImage = image
         try {
-            val result = qrReader.read(data, 0, 0, width, height, width, height)
+            qrReader.read(data, 0, 0, width, height, width, height)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -109,8 +116,9 @@ class QRCZXingCodeAnalyzer(private val module: CameraXModule, function: (String)
     }
 
     internal fun resetAnalyzer() {
+        stopSpan = false
+        qrReader.setReadCodeListener(this)
         qrReader.prepareRead()
-        pauseImage?.close()
     }
 
     override fun onAnalysisBrightness(isDark: Boolean) {
@@ -128,6 +136,7 @@ class QRCZXingCodeAnalyzer(private val module: CameraXModule, function: (String)
         }
         BarCodeUtil.d("result : $result")
         if (!TextUtils.isEmpty(result.text)) {
+            stopSpan = true
             qrReader.stopRead()
             listener.onQrCode(result.text)
         } else if (result.points != null) {
