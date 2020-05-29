@@ -28,11 +28,11 @@ class CameraXModule(private val view: AutoZoomScanView) {
     private var imageAnalyzer: ImageAnalysis? = null
     private lateinit var cameraExecutor: ExecutorService
     private var camera: Camera? = null
-    private lateinit var qrCodeAnalyzer: QRCodeAnalyzer
+    private lateinit var qrCodeAnalyzer: QRCZXingCodeAnalyzer
     private lateinit var mLifecycleOwner: LifecycleOwner
 
 
-    fun bindWithCameraX(function: (Result) -> Unit, lifecycleOwner: LifecycleOwner) {
+    fun bindWithCameraX(function: (String) -> Unit, lifecycleOwner: LifecycleOwner) {
         mLifecycleOwner = lifecycleOwner
         val metrics = DisplayMetrics().also { view.display.getRealMetrics(it) }
         Log.d(TAG, "Screen metrics: ${metrics.widthPixels} x ${metrics.heightPixels}")
@@ -51,10 +51,10 @@ class CameraXModule(private val view: AutoZoomScanView) {
                     .setTargetResolution(Size(width, height))
                     // Set initial target rotation
                     .build()
-                preview?.setSurfaceProvider(view.preView.createSurfaceProvider(null))
+                preview?.setSurfaceProvider(view.preView.createSurfaceProvider())
 
                 cameraExecutor = Executors.newSingleThreadExecutor()
-                qrCodeAnalyzer = QRCodeAnalyzer(this) { function(it) }
+                qrCodeAnalyzer = QRCZXingCodeAnalyzer(this) { function(it) }
                 // ImageAnalysis
                 imageAnalyzer = ImageAnalysis.Builder()
                     // We request aspect ratio but no resolution

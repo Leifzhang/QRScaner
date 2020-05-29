@@ -29,16 +29,12 @@ class AutoZoomScanView @JvmOverloads constructor(
         return true
     }
 
-    override fun onSizeChanged(w: Int, h: Int, oldw: Int, oldh: Int) {
-        super.onSizeChanged(w, h, oldw, oldh)
-    }
-
     fun bindWithLifeCycle(lifecycleOwner: LifecycleOwner) {
         preView.post {
             cameraXModule.bindWithCameraX({
                 try {
                     preView.post {
-                        resultListener?.onSuccess(this, it.text)
+                        resultListener?.onSuccess(this, it)
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()

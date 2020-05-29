@@ -38,7 +38,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    def camerax_version = '1.0.0-beta03'
+    def camerax_version = '1.0.0-beta04'
     implementation "androidx.camera:camera-core:$camerax_version"
 
     // CameraX Camera2 extensions
@@ -48,7 +48,8 @@ dependencies {
     implementation "androidx.camera:camera-lifecycle:$camerax_version"
 
     // CameraX View class
-    implementation 'androidx.camera:camera-view:1.0.0-alpha10'
+    implementation 'androidx.camera:camera-view:1.0.0-alpha11'
+    implementation project(":czxinglibrary")
 
     implementation 'com.google.zxing:core:3.4.0'
     testImplementation 'junit:junit:4.13'

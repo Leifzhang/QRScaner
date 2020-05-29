@@ -11,12 +11,11 @@ import com.google.zxing.*
 import com.google.zxing.common.HybridBinarizer
 import com.google.zxing.qrcode.detector.Detector
 import java.nio.ByteBuffer
-import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 
-class QRCodeAnalyzer(private val module: CameraXModule, function: (Result) -> Unit) :
+class QRCodeAnalyzer(private val module: CameraXModule, function: (String) -> Unit) :
     ImageAnalysis.Analyzer {
 
     private val map = mapOf<DecodeHintType, Collection<BarcodeFormat>>(
@@ -30,8 +29,10 @@ class QRCodeAnalyzer(private val module: CameraXModule, function: (Result) -> Un
     private var pauseImage: ImageProxy? = null
 
     private val listener: QrCodeCallBack = object : QrCodeCallBack {
-        override fun onQrCode(result: Result) {
-            function(result)
+
+
+        override fun onQrCode(text: String) {
+            function(text)
         }
 
     }
@@ -69,7 +70,7 @@ class QRCodeAnalyzer(private val module: CameraXModule, function: (Result) -> Un
                 "resolved!!! = $result  timeUsage:${System.currentTimeMillis() - startTime}"
             )
             pauseImage = image
-            listener.onQrCode(result)
+            listener.onQrCode(result.text)
         } catch (e: Exception) {
             // e.printStackTrace()
             image.close()
@@ -111,10 +112,10 @@ class QRCodeAnalyzer(private val module: CameraXModule, function: (Result) -> Un
 }
 
 interface QrCodeCallBack {
-    fun onQrCode(result: Result)
+    fun onQrCode(text: String)
 }
 
-private fun ByteBuffer.toByteArray(): ByteArray {
+internal fun ByteBuffer.toByteArray(): ByteArray {
     rewind()
     val data = ByteArray(remaining())
     get(data)
